@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SessionWindow</class>
+ <widget class="QMainWindow" name="SessionWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>960</width>
+    <height>640</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>PC &amp; Session Management</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+    <item>
+     <layout class="QHBoxLayout" name="contentLayout">
+      <item>
+       <widget class="QGroupBox" name="pcGroupBox">
+        <property name="title">
+         <string>PC Availability</string>
+        </property>
+        <layout class="QVBoxLayout" name="pcLayout">
+         <item>
+          <widget class="QTableWidget" name="pcTable"/>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="pcButtonLayout">
+           <item>
+            <widget class="QPushButton" name="lockButton">
+             <property name="text">
+              <string>Lock</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="unlockButton">
+             <property name="text">
+              <string>Unlock</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QGroupBox" name="sessionGroupBox">
+        <property name="title">
+         <string>Sessions</string>
+        </property>
+        <layout class="QVBoxLayout" name="sessionLayout">
+         <item>
+          <widget class="QTableWidget" name="sessionTable"/>
+         </item>
+         <item>
+          <layout class="QFormLayout" name="formLayout">
+           <item row="0" column="0">
+            <widget class="QLabel" name="customerIdLabel">
+             <property name="text">
+              <string>Customer ID</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QSpinBox" name="customerIdSpinBox">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>999999</number>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="durationLabel">
+             <property name="text">
+              <string>Duration (minutes)</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="durationSpinBox">
+             <property name="minimum">
+              <number>1</number>
+             </property>
+             <property name="maximum">
+              <number>1440</number>
+             </property>
+             <property name="value">
+              <number>60</number>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QHBoxLayout" name="sessionButtonLayout">
+           <item>
+            <widget class="QPushButton" name="startButton">
+             <property name="text">
+              <string>Start Session</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="endButton">
+             <property name="text">
+              <string>End Session</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
