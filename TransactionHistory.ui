@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>TransactionHistory</class>
+
+ <widget class="QDialog" name="TransactionHistory">
+
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>850</width>
+    <height>520</height>
+   </rect>
+  </property>
+
+  <property name="windowTitle">
+   <string>Transaction History</string>
+  </property>
+
+  <layout class="QVBoxLayout">
+
+   <item>
+    <widget class="QLabel" name="labelTitle">
+     <property name="text">
+      <string>TRANSACTION HISTORY</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignCenter</set>
+     </property>
+    </widget>
+   </item>
+
+   <item>
+    <widget class="QTableWidget" name="tableTransaction">
+     <property name="columnCount">
+      <number>6</number>
+     </property>
+
+     <column>
+      <property name="text">
+       <string>ID</string>
+      </property>
+     </column>
+
+     <column>
+      <property name="text">
+       <string>Date</string>
+      </property>
+     </column>
+
+     <column>
+      <property name="text">
+       <string>Type</string>
+      </property>
+     </column>
+
+     <column>
+      <property name="text">
+       <string>Amount</string>
+      </property>
+     </column>
+
+     <column>
+      <property name="text">
+       <string>Status</string>
+      </property>
+     </column>
+
+     <column>
+      <property name="text">
+       <string>Balance After</string>
+      </property>
+     </column>
+    </widget>
+   </item>
+
+   <item>
+    <layout class="QHBoxLayout">
+
+     <item>
+      <widget class="QPushButton" name="btnRefresh">
+       <property name="text">
+        <string>Refresh</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QPushButton" name="btnReceipt">
+       <property name="text">
+        <string>Print Receipt</string>
+       </property>
+      </widget>
+     </item>
+
+     <item>
+      <widget class="QPushButton" name="btnClose">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+  </layout>
+
+ </widget>
+
+ <resources/>
+ <connections/>
+</ui>
