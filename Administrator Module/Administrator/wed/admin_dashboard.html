@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Cyber Cafe Admin Dashboard</title>
+
+    <link rel="stylesheet"
+          href="admin_dashboard.css">
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- Sidebar -->
+
+    <aside class="sidebar">
+
+        <h2>Cyber Cafe</h2>
+
+        <ul>
+
+            <li class="active">Dashboard</li>
+
+            <li onclick="location.href='customer_management.html'">
+                Customers
+            </li>
+
+            <li onclick="location.href='pc_monitor.html'">
+                PC Monitor
+            </li>
+
+            <li onclick="location.href='report.html'">
+                Reports
+            </li>
+
+            <li onclick="logout()">🚪 Logout</li>
+
+        </ul>
+
+    </aside>
+
+    <!-- Main -->
+
+    <main class="main">
+
+        <header>
+
+            <h1>Administrator Dashboard</h1>
+
+        </header>
+
+        <!-- Cards -->
+
+        <section class="cards">
+
+            <div class="card">
+
+                <h3>Total Customers</h3>
+
+                <h1 id="customerCount">0</h1>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Online PCs</h3>
+
+                <h1 id="onlinePC">0</h1>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Offline PCs</h3>
+
+                <h1 id="offlinePC">0</h1>
+
+            </div>
+
+            <div class="card">
+
+                <h3>Today's Revenue</h3>
+
+                <h1 id="revenue">0 VNĐ</h1>
+
+            </div>
+
+        </section>
+
+        <!-- Recent Customers -->
+
+        <section class="table-section">
+
+            <h2>Recent Customers</h2>
+
+            <table>
+
+                <thead>
+
+                <tr>
+
+                    <th>Username</th>
+
+                    <th>Balance</th>
+
+                    <th>Status</th>
+
+                </tr>
+
+                </thead>
+
+                <tbody id="customerTable">
+
+                </tbody>
+
+            </table>
+
+        </section>
+
+    </main>
+
+</div>
+
+<script src="admin_dashboard.js"></script>
+
+</body>
+</html>
