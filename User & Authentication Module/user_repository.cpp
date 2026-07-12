@@ -2,7 +2,7 @@
 
 #include <QSqlQuery>
 #include <QSqlError>
-#include <QSqlRecord>
+#include <QDateTime>
 #include <QVariant>
 
 UserRepository::UserRepository(QSqlDatabase db)
@@ -67,7 +67,7 @@ bool UserRepository::insertUser(const User& user, int& newId, QString& errorMess
     query.bindValue(":phone", user.phone());
     query.bindValue(":balance", user.balance());
     query.bindValue(":role", user.role().isEmpty() ? "customer" : user.role());
-    query.bindValue(":created_at", QDateTime::currentDateTime());
+    query.bindValue(":created_at", user.createdAt());
 
     if (!query.exec()) {
         errorMessage = query.lastError().text();
@@ -81,36 +81,75 @@ bool UserRepository::insertUser(const User& user, int& newId, QString& errorMess
 std::optional<User> UserRepository::findByUsername(const QString& username)
 {
     QSqlQuery query(m_db);
-    query.prepare("SELECT * FROM users WHERE username = :username LIMIT 1");
+
+    query.prepare(
+        "SELECT id, username, password_hash, full_name, email, phone, balance, role, created_at "
+        "FROM users "
+        "WHERE username = :username "
+        "LIMIT 1");
+
     query.bindValue(":username", username);
 
-    if (!query.exec() || !query.next()) {
+    if (!query.exec())
+    {
         return std::nullopt;
     }
+
+    if (!query.next())
+    {
+        return std::nullopt;
+    }
+
     return userFromQuery(query);
 }
 
 std::optional<User> UserRepository::findById(int id)
 {
     QSqlQuery query(m_db);
-    query.prepare("SELECT * FROM users WHERE id = :id LIMIT 1");
+
+    query.prepare(
+        "SELECT id, username, password_hash, full_name, email, phone, balance, role, created_at "
+        "FROM users "
+        "WHERE id = :id "
+        "LIMIT 1");
+
     query.bindValue(":id", id);
 
-    if (!query.exec() || !query.next()) {
+    if (!query.exec())
+    {
         return std::nullopt;
     }
+
+    if (!query.next())
+    {
+        return std::nullopt;
+    }
+
     return userFromQuery(query);
 }
 
 std::optional<User> UserRepository::findByEmail(const QString& email)
 {
     QSqlQuery query(m_db);
-    query.prepare("SELECT * FROM users WHERE email = :email LIMIT 1");
+
+    query.prepare(
+        "SELECT id, username, password_hash, full_name, email, phone, balance, role, created_at "
+        "FROM users "
+        "WHERE email = :email "
+        "LIMIT 1");
+
     query.bindValue(":email", email);
 
-    if (!query.exec() || !query.next()) {
+    if (!query.exec())
+    {
         return std::nullopt;
     }
+
+    if (!query.next())
+    {
+        return std::nullopt;
+    }
+
     return userFromQuery(query);
 }
 
