@@ -1,44 +1,79 @@
-#pragma once
+#include "ProfileManager.h"
 
-#include <QObject>
-#include <QString>
-#include <optional>
-#include "User.h"
-#include "user_repository.h"
-#include "AuthController.h"
-
-// ProfileManager handles changes to an EXISTING account:
-// editing profile info and changing the password.
-// (AuthController handles creating the account and logging in.)
-class ProfileManager : public QObject
+ProfileManager::ProfileManager(UserRepository* repository,
+                                 AuthController* authController,
+                                 QObject* parent)
+    : QObject(parent),
+      m_repository(repository),
+      m_authController(authController)
 {
-    Q_OBJECT
+}
 
-public:
-    explicit ProfileManager(UserRepository* repository,
-                             AuthController* authController,
-                             QObject* parent = nullptr);
+std::optional<User> ProfileManager::getProfile(int userId)
+{
+    return m_repository->findById(userId);
+}
 
-    // Updates name/email/phone for the given user.
-    bool updateProfile(int userId,
-                        const QString& fullName,
-                        const QString& email,
-                        const QString& phone,
-                        QString& errorMessage);
+bool ProfileManager::updateProfile(int userId,
+                                     const QString& fullName,
+                                     const QString& email,
+                                     const QString& phone,
+                                     QString& errorMessage)
+{
+    auto userOpt = m_repository->findById(userId);
+    if (!userOpt.has_value()) {
+        errorMessage = "User not found.";
+        return false;
+    }
 
-    // Verifies oldPassword, then sets newPassword if it's valid.
-    bool changePassword(int userId,
-                         const QString& oldPassword,
-                         const QString& newPassword,
-                         QString& errorMessage);
+    // If the email is changing, make sure nobody else already has it.
+    User user = userOpt.value();
+    if (!email.isEmpty() && email != user.email() && m_repository->emailExists(email)) {
+        errorMessage = "Email is already in use by another account.";
+        return false;
+    }
 
-    std::optional<User> getProfile(int userId);
+    user.setFullName(fullName);
+    user.setEmail(email);
+    user.setPhone(phone);
 
-signals:
-    void profileUpdated(const User& user);
-    void passwordChanged();
+    if (!m_repository->updateProfile(user, errorMessage)) {
+        return false;
+    }
 
-private:
-    UserRepository* m_repository;
-    AuthController* m_authController;
-};
+    emit profileUpdated(user);
+    return true;
+}
+
+bool ProfileManager::changePassword(int userId,
+                                      const QString& oldPassword,
+                                      const QString& newPassword,
+                                      QString& errorMessage)
+{
+    auto userOpt = m_repository->findById(userId);
+    if (!userOpt.has_value()) {
+        errorMessage = "User not found.";
+        return false;
+    }
+
+    const User& user = userOpt.value();
+    if (!AuthController::verifyPassword(oldPassword, user.passwordHash())) {
+        errorMessage = "Current password is incorrect.";
+        return false;
+    }
+
+    if (newPassword.length() < 6) {
+        errorMessage = "New password must be at least 6 characters.";
+        return false;
+    }
+
+    const QString salt = AuthController::generateSalt();
+    const QString newHash = salt + "$" + AuthController::hashPassword(newPassword, salt);
+
+    if (!m_repository->updatePasswordHash(userId, newHash, errorMessage)) {
+        return false;
+    }
+
+    emit passwordChanged();
+    return true;
+}

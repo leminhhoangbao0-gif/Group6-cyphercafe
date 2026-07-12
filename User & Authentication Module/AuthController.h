@@ -1,59 +1,54 @@
+#pragma once
+
+#include <QObject>
+#include <QString>
+#include <optional>
 #include "User.h"
+#include "user_repository.h"
 
-User::User()
-    : m_id(-1),
-      m_balance(0.0),
-      m_role("customer")
+// AuthController handles everything related to "logging in" as opposed
+// to "storing data": login, register, logout, and password hashing.
+// It keeps track of the currently logged-in user for the whole app
+// (this is the "session login request" mentioned in the module spec).
+class AuthController : public QObject
 {
-}
+    Q_OBJECT
 
-User::User(int id,
-            const QString& username,
-            const QString& passwordHash,
-            const QString& fullName,
-            const QString& email,
-            const QString& phone,
-            double balance,
-            const QString& role,
-            const QDateTime& createdAt)
-    : m_id(id),
-      m_username(username),
-      m_passwordHash(passwordHash),
-      m_fullName(fullName),
-      m_email(email),
-      m_phone(phone),
-      m_balance(balance),
-      m_role(role),
-      m_createdAt(createdAt)
-{
-}
+public:
+    explicit AuthController(UserRepository* repository, QObject* parent = nullptr);
 
-int User::id() const { return m_id; }
-QString User::username() const { return m_username; }
-QString User::passwordHash() const { return m_passwordHash; }
-QString User::fullName() const { return m_fullName; }
-QString User::email() const { return m_email; }
-QString User::phone() const { return m_phone; }
-double User::balance() const { return m_balance; }
-QString User::role() const { return m_role; }
-QDateTime User::createdAt() const { return m_createdAt; }
+    // Creates a new account. Returns true on success.
+    // On failure, errorMessage explains why (e.g. "Username already taken").
+    bool registerUser(const QString& username,
+                       const QString& password,
+                       const QString& fullName,
+                       const QString& email,
+                       const QString& phone,
+                       QString& errorMessage);
 
-void User::setId(int id) { m_id = id; }
-void User::setUsername(const QString& username) { m_username = username; }
-void User::setPasswordHash(const QString& passwordHash) { m_passwordHash = passwordHash; }
-void User::setFullName(const QString& fullName) { m_fullName = fullName; }
-void User::setEmail(const QString& email) { m_email = email; }
-void User::setPhone(const QString& phone) { m_phone = phone; }
-void User::setBalance(double balance) { m_balance = balance; }
-void User::setRole(const QString& role) { m_role = role; }
-void User::setCreatedAt(const QDateTime& createdAt) { m_createdAt = createdAt; }
+    // Attempts to log in. Returns true on success and sets the current user.
+    bool login(const QString& username, const QString& password, QString& errorMessage);
 
-bool User::isValid() const
-{
-    return m_id > 0;
-}
+    // Clears the current session.
+    void logout();
 
-bool User::isAdmin() const
-{
-    return m_role.compare("admin", Qt::CaseInsensitive) == 0;
-}
+    bool isLoggedIn() const;
+    std::optional<User> currentUser() const;
+
+    // --- Password helpers (also usable by ProfileManager) ---
+    // Format stored in DB: "salt$hash"
+    static QString hashPassword(const QString& password, const QString& salt);
+    static QString generateSalt();
+    static bool verifyPassword(const QString& password, const QString& storedHash);
+
+signals:
+    void loginSucceeded(const User& user);
+    void loginFailed(const QString& reason);
+    void registrationSucceeded(const User& user);
+    void registrationFailed(const QString& reason);
+    void loggedOut();
+
+private:
+    UserRepository* m_repository;
+    std::optional<User> m_currentUser;
+};

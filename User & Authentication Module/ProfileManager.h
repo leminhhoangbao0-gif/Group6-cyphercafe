@@ -5,50 +5,40 @@
 #include <optional>
 #include "User.h"
 #include "user_repository.h"
+#include "AuthController.h"
 
-// AuthController handles everything related to "logging in" as opposed
-// to "storing data": login, register, logout, and password hashing.
-// It keeps track of the currently logged-in user for the whole app
-// (this is the "session login request" mentioned in the module spec).
-class AuthController : public QObject
+// ProfileManager handles changes to an EXISTING account:
+// editing profile info and changing the password.
+// (AuthController handles creating the account and logging in.)
+class ProfileManager : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit AuthController(UserRepository* repository, QObject* parent = nullptr);
+    explicit ProfileManager(UserRepository* repository,
+                             AuthController* authController,
+                             QObject* parent = nullptr);
 
-    // Creates a new account. Returns true on success.
-    // On failure, errorMessage explains why (e.g. "Username already taken").
-    bool registerUser(const QString& username,
-                       const QString& password,
-                       const QString& fullName,
-                       const QString& email,
-                       const QString& phone,
-                       QString& errorMessage);
+    // Updates name/email/phone for the given user.
+    bool updateProfile(int userId,
+                        const QString& fullName,
+                        const QString& email,
+                        const QString& phone,
+                        QString& errorMessage);
 
-    // Attempts to log in. Returns true on success and sets the current user.
-    bool login(const QString& username, const QString& password, QString& errorMessage);
+    // Verifies oldPassword, then sets newPassword if it's valid.
+    bool changePassword(int userId,
+                         const QString& oldPassword,
+                         const QString& newPassword,
+                         QString& errorMessage);
 
-    // Clears the current session.
-    void logout();
-
-    bool isLoggedIn() const;
-    std::optional<User> currentUser() const;
-
-    // --- Password helpers (also usable by ProfileManager) ---
-    // Format stored in DB: "salt$hash"
-    static QString hashPassword(const QString& password, const QString& salt);
-    static QString generateSalt();
-    static bool verifyPassword(const QString& password, const QString& storedHash);
+    std::optional<User> getProfile(int userId);
 
 signals:
-    void loginSucceeded(const User& user);
-    void loginFailed(const QString& reason);
-    void registrationSucceeded(const User& user);
-    void registrationFailed(const QString& reason);
-    void loggedOut();
+    void profileUpdated(const User& user);
+    void passwordChanged();
 
 private:
     UserRepository* m_repository;
-    std::optional<User> m_currentUser;
+    AuthController* m_authController;
 };

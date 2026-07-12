@@ -1,65 +1,57 @@
-#include "RegisterWindow.h"
-#include "ui_RegisterWindow.h"
+#include "LoginWindow.h"
+#include "ui_LoginWindow.h"
 
-RegisterWindow::RegisterWindow(AuthController* authController, QWidget* parent)
+LoginWindow::LoginWindow(AuthController* authController, QWidget* parent)
     : QWidget(parent),
-      ui(new Ui::RegisterWindow),
+      ui(new Ui::LoginWindow),
       m_authController(authController)
 {
     ui->setupUi(this);
 
-    connect(ui->registerButton, &QPushButton::clicked, this, &RegisterWindow::onRegisterButtonClicked);
-    connect(ui->goToLoginButton, &QPushButton::clicked, this, &RegisterWindow::onGoToLoginClicked);
+    connect(ui->loginButton, &QPushButton::clicked, this, &LoginWindow::onLoginButtonClicked);
+    connect(ui->goToRegisterButton, &QPushButton::clicked, this, &LoginWindow::onGoToRegisterClicked);
+
+    // Allow pressing Enter in the password field to submit the form.
+    connect(ui->passwordLineEdit, &QLineEdit::returnPressed, this, &LoginWindow::onLoginButtonClicked);
 }
 
-RegisterWindow::~RegisterWindow()
+LoginWindow::~LoginWindow()
 {
     delete ui;
 }
 
-void RegisterWindow::onRegisterButtonClicked()
+void LoginWindow::onLoginButtonClicked()
 {
     clearError();
 
     const QString username = ui->usernameLineEdit->text().trimmed();
-    const QString fullName = ui->fullNameLineEdit->text().trimmed();
-    const QString email = ui->emailLineEdit->text().trimmed();
-    const QString phone = ui->phoneLineEdit->text().trimmed();
     const QString password = ui->passwordLineEdit->text();
-    const QString confirmPassword = ui->confirmPasswordLineEdit->text();
 
     if (username.isEmpty() || password.isEmpty()) {
-        showError("Username and password are required.");
-        return;
-    }
-
-    if (password != confirmPassword) {
-        showError("Passwords do not match.");
+        showError("Please enter both username and password.");
         return;
     }
 
     QString errorMessage;
-    if (m_authController->registerUser(username, password, fullName, email, phone, errorMessage)) {
+    if (m_authController->login(username, password, errorMessage)) {
         ui->passwordLineEdit->clear();
-        ui->confirmPasswordLineEdit->clear();
-        emit registrationSuccessful(m_authController->currentUser().value_or(User()));
-        emit goToLoginRequested(); // send them to log in with their new account
+        emit loginSuccessful(m_authController->currentUser().value());
     } else {
         showError(errorMessage);
     }
 }
 
-void RegisterWindow::onGoToLoginClicked()
+void LoginWindow::onGoToRegisterClicked()
 {
-    emit goToLoginRequested();
+    emit goToRegisterRequested();
 }
 
-void RegisterWindow::showError(const QString& message)
+void LoginWindow::showError(const QString& message)
 {
     ui->errorLabel->setText(message);
 }
 
-void RegisterWindow::clearError()
+void LoginWindow::clearError()
 {
     ui->errorLabel->setText("");
 }
